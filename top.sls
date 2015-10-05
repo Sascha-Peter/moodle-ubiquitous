@@ -13,6 +13,14 @@ base:
     - app
   'db-*':
     - db
+
+  'file-*':
+    - file-base
+  'file-mon-*':
+    - file-mon
+  'file-osd-*':
+    - file-osd
+
   'salt':
     - salt
 
