@@ -17,7 +17,7 @@ Vagrant.configure(2) do |config|
     salt.vm.synced_folder ".", "/srv/salt", type: "rsync"
 
     salt.vm.provision "salt-salt", type: "shell", path: "vagrant/salt/install",
-                      args: [ "--master", "app-debug-1,db-1,mail-debug,salt,selenium-hub,selenium-node-chrome,selenium-node-firefox", "--minion", "salt", "--root", "/srv/salt/vagrant/salt" ]
+                      args: [ "--master", "app-debug-1,db-1,file-mon-1,file-osd-1,file-osd-2,mail-debug,salt,selenium-hub,selenium-node-chrome,selenium-node-firefox", "--minion", "salt", "--root", "/srv/salt/vagrant/salt" ]
   end
 
   config.vm.define "app-debug-1" do |appdebug1|
@@ -101,6 +101,42 @@ Vagrant.configure(2) do |config|
     seleniumnodefirefox.vm.synced_folder "../moodle", "/var/lib/selenium/moodle", type: "rsync", owner: 'selenium', group: 'selenium',
                                          rsync__exclude: ".git/",
                                          rsync__args: ["--rsync-path='sudo rsync'", "--archive", "--compress", "--delete"]
+  end
+
+  config.vm.define "file-mon-1" do |filemon1|
+    filemon1.vm.network "private_network", ip: "192.168.120.250"
+    filemon1.vm.network "private_network", ip: "192.168.130.10"
+    filemon1.vm.hostname = "file-mon-1.moodle"
+
+    filemon1.ssh.port = 2230
+    filemon1.vm.network "forwarded_port", guest: 22, host: filemon1.ssh.port
+
+    filemon1.vm.synced_folder "./vagrant", "/vagrant", type: "rsync"
+    filemon1.vm.provision "file-mon-1-salt", type: "shell", path: "vagrant/salt/install", args: [ "--minion", "file-mon-1", "--root", "/vagrant/salt" ]
+  end
+
+  config.vm.define "file-osd-1" do |fileosd1|
+    fileosd1.vm.network "private_network", ip: "192.168.120.251"
+    fileosd1.vm.network "private_network", ip: "192.168.130.11"
+    fileosd1.vm.hostname = "file-osd-1.moodle"
+
+    fileosd1.ssh.port = 2231
+    fileosd1.vm.network "forwarded_port", guest: 22, host: fileosd1.ssh.port
+
+    fileosd1.vm.synced_folder "./vagrant", "/vagrant", type: "rsync"
+    fileosd1.vm.provision "file-osd-1-salt", type: "shell", path: "vagrant/salt/install", args: [ "--minion", "file-osd-1", "--root", "/vagrant/salt" ]
+  end
+
+  config.vm.define "file-osd-2" do |fileosd2|
+    fileosd2.vm.network "private_network", ip: "192.168.120.252"
+    fileosd2.vm.network "private_network", ip: "192.168.130.12"
+    fileosd2.vm.hostname = "file-osd-2.moodle"
+
+    fileosd2.ssh.port = 2232
+    fileosd2.vm.network "forwarded_port", guest: 22, host: fileosd2.ssh.port
+
+    fileosd2.vm.synced_folder "./vagrant", "/vagrant", type: "rsync"
+    fileosd2.vm.provision "file-osd-2-salt", type: "shell", path: "vagrant/salt/install", args: [ "--minion", "file-osd-2", "--root", "/vagrant/salt" ]
   end
 
   # If such a file exists, load the user's local configuration.

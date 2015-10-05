@@ -1,4 +1,4 @@
-# Ubiquitous Moodle
+# The Perfect Cluster: Moodle
 
 A work in progress sample Moodle configuration comprised of:
 
@@ -32,6 +32,9 @@ details.
 | `192.168.120.110` | `selenium-node-firefox.moodle` | Selenium node (Firefox)         |
 | `192.168.120.150` | `db-1.moodle`                  | PostgreSQL server               |
 | `192.168.120.200` | `mail-debug.moodle`            | Mail catcher                    |
+| `192.168.120.250` | `file-mon-1.moodle`            | Ceph MON                        |
+| `192.168.120.251` | `file-osd-1.moodle`            | Ceph OSD 1                      |
+| `192.168.120.252` | `file-osd-2.moodle`            | Ceph OSD 2                      |
 
 ### Configuration values
 
