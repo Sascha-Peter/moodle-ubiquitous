@@ -6,6 +6,7 @@ A work in progress sample Moodle configuration comprised of:
 * Static file serving with [nginx](http://nginx.org/)
 * [PHP 5.6](http://php.net/), with the FPM SAPI and OPcache
 * [PostgreSQL 9.4](http://www.postgresql.org/)
+* File storage with [Ceph](http://ceph.com/)
 
 * * *
 
