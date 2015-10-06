@@ -1,0 +1,40 @@
+#!/bin/sh
+
+#
+# The Perfect Cluster: Moodle
+#
+# @author Luke Carrier <luke.carrier@floream.com>
+# @copyright 2015 Floream Limited
+#
+
+eval set -- "$(getopt -o "ihnr:" --long "fsid:,mon-hosts:,mon-ips:,root:" -- "$@")"
+while true; do
+    case "$1" in
+        -i|--fsid     ) fsid="$2"                           ; shift 2 ;;
+        -h|--mon-hosts) mon_hosts=($(echo $2 | tr "," " ")) ; shift 2 ;;
+        -n|--mon-ips  ) mon_ips=($(echo $2 | tr "," " "))   ; shift 2 ;;
+        -r|--root     ) root="$2"                           ; shift 2 ;;
+        *             ) break                               ;         ;;
+    esac
+done
+
+admin_keyring="${root}/ceph.client.admin.keyring"
+mon_keyring="${root}/ceph.mon.keyring"
+monmap="${root}/monmap"
+
+# Generate a new cluster keyring
+ceph-authtool --create-keyring "$mon_keyring" --gen-key -n mon. --cap mon 'allow *'
+
+# Generate a new administrator keyring
+ceph-authtool --create-keyring "$admin_keyring" --gen-key -n client.admin --set-uid=0 --cap mon 'allow *' --cap osd 'allow *' --cap mds 'allow'
+
+# Add the administrator keyring to the cluster keyring
+ceph-authtool "$mon_keyring" --import-keyring "$admin_keyring"
+
+# Add each of the MONs to the monitor map
+for i in "${!mon_hosts[@]}"; do
+    host="${mon_hosts[$i]}"
+    ip="${mon_ips[$i]}"
+
+    monmaptool --create --add "$host" "$ip" --fsid "$fsid" "$monmap"
+done
